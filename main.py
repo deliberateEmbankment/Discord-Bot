@@ -19,6 +19,8 @@ sentences = ["Tout ce qui est, est en Dieu, et rien, sans Dieu, ne peut ni etre 
 if "responding" not in db.keys():
     db["responding"] = True
 
+db["confusion"] = []
+
 def update_confusion(confusing_message):
   if "confusion" in db.keys():
     confusion = db["confusion"]
@@ -78,7 +80,8 @@ async def on_message(message):
     if db["responding"]:
       options = sentences
       if "confusion" in db.keys():
-        options = options + db["confusion"]
+        if db["confusion"] != None:
+          options = options + db["confusion"]
 
       if any(word in message.content for word in words):
       #if word is in list of key words, print a random sentence from the list of quotes
@@ -87,18 +90,18 @@ async def on_message(message):
     if message.content.startswith("!new"):
       confusing_message = message.content.split("!new ",1)[1]
       update_confusion(confusing_message)
-      await message.channel.send("New confusing message added.")
+      await message.channel.send("New message added.")
 
     if message.content.startswith("!del")  :
-      confusion = []
-      if confusion in db.keys():
-        index = int(message.content.split("$del",1)[1])
-        delete_confusion(index)
-        confusion = db["confusion"]
+
+      index = int(message.content.split("!del",1)[1])
+    
+      delete_confusion(index)
+      confusion = db["confusion"]
       await message.channel.send(confusion) 
 
     if message.content.startswith("!list"):
-      confusion = []
+      confusion = [None]
       if "confusion" in db.keys():
         confusion = db["confusion"]
       await message.channel.send(confusion)
